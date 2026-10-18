@@ -2,6 +2,8 @@
 
 A collaborative Kanban board where every change shows up for your teammates instantly. Drag a card in one window and watch it move in the other.
 
+**[Live demo](https://realtime-board-green.vercel.app)** (one click, no sign-up; open it in two windows)
+
 **Next.js 16 · NestJS 12 · PostgreSQL · Prisma 7 · Socket.IO · TanStack Query · dnd-kit · Zod**
 
 ![Board with live presence and activity feed](docs/board-light.png)
