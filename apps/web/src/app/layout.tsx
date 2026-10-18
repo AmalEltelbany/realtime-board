@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Geist_Mono } from "next/font/google";
+import { Bowlby_One, Geist_Mono, Inter } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+// Display face (stand-in for Lateral 800) and UI face (stand-in for Aeonik Pro).
+const bowlby = Bowlby_One({
+  variable: "--font-bowlby",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -20,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${bowlby.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
       </body>

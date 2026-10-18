@@ -8,7 +8,7 @@ A collaborative Kanban board where every change shows up for your teammates inst
 
 ![Board with live presence and activity feed](docs/board-light.png)
 
-<p align="center"><img src="docs/board-dark.png" width="49%" alt="Dark mode, second user's view"/> <img src="docs/landing.png" width="49%" alt="Landing page"/></p>
+<p align="center"><img src="docs/boards.png" width="49%" alt="Your boards"/> <img src="docs/landing.png" width="49%" alt="Landing page"/></p>
 
 ## Features
 

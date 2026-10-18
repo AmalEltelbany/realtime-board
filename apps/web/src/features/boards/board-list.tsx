@@ -26,61 +26,58 @@ export function BoardList() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
+      <header className="border-b border-carbon bg-paper">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-5 py-3 lg:px-10">
           <Link href="/" aria-label="Realtime Board home"><Logo /></Link>
-          <div className="ms-auto flex items-center gap-2 text-sm text-muted">
+          <div className="ms-auto flex items-center gap-2 text-sm">
             {session.data && (
-              <span className="flex items-center gap-2 rounded-full bg-surface-muted py-1 pe-3 ps-1">
+              <span className="flex items-center gap-2 rounded-full border border-carbon py-1 pe-3 ps-1 font-bold">
                 <Avatar name={session.data.name} size="sm" /> {session.data.name}
               </span>
             )}
-            <Button variant="ghost" onClick={() => logout.mutate()}>Sign out</Button>
+            <Button variant="secondary" onClick={() => logout.mutate()}>Sign out</Button>
           </div>
         </div>
       </header>
 
-      <main className="dot-grid flex-1">
-        <div className="mx-auto w-full max-w-5xl px-4 py-12">
-          <h1 className="text-4xl font-extrabold tracking-tight">Your boards</h1>
-          <p className="mt-2 text-muted">Open one in two windows to see live updates.</p>
+      <main className="flex-1 bg-sky-wash">
+        <div className="mx-auto w-full max-w-[1440px] px-5 py-14 lg:px-10">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <h1 className="display text-[clamp(3.5rem,8vw,6.5rem)]">Your boards</h1>
+              <p className="mt-4 text-lg">Open one in two windows to see live updates.</p>
+            </div>
+            <form onSubmit={onSubmit} className="flex w-full max-w-md gap-2">
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="New board name" maxLength={100} />
+              <Button type="submit" disabled={!title.trim() || create.isPending} className="shrink-0">Create board</Button>
+            </form>
+          </div>
 
-          <form onSubmit={onSubmit} className="mt-8 flex max-w-xl gap-2 rounded-full border border-border bg-surface p-1.5 shadow-sm">
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="New board name"
-              maxLength={100}
-              className="border-0 bg-transparent focus:ring-0"
-            />
-            <Button type="submit" disabled={!title.trim() || create.isPending} className="shrink-0">Create board</Button>
-          </form>
-
-          {boards.isPending && <p className="mt-10 text-sm text-muted">Loading boards…</p>}
-          {boards.isError && <p className="mt-10 text-sm text-danger">{boards.error.message}</p>}
+          {boards.isPending && <p className="mt-12 text-sm">Loading boards…</p>}
+          {boards.isError && <p className="mt-12 text-sm text-danger">{boards.error.message}</p>}
           {boards.data?.length === 0 && (
-            <div className="mt-10 rounded-3xl border-2 border-dashed border-border bg-surface/70 p-10 text-center">
-              <p className="text-lg font-bold">No boards yet</p>
-              <p className="mt-1 text-muted">Create your first one above.</p>
+            <div className="mt-12 rounded-[30px] border border-dashed border-carbon bg-paper p-12 text-center">
+              <p className="display text-4xl">No boards yet</p>
+              <p className="mt-3">Create your first one above.</p>
             </div>
           )}
 
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {boards.data?.map((board) => (
               <li key={board.id}>
                 <Link
                   href={`/boards/${board.id}`}
-                  className="group block overflow-hidden rounded-3xl border border-border bg-surface transition hover:-translate-y-1 hover:shadow-xl"
+                  className="group block overflow-hidden rounded-[30px] border border-carbon bg-paper transition-transform hover:-rotate-1"
                 >
-                  <div aria-hidden className={`flex h-24 items-end gap-2 p-4 ${noteColor(board.id)}`}>
-                    <span className="h-12 w-1/3 rounded-xl bg-white/60" />
-                    <span className="h-16 w-1/3 rounded-xl bg-white/60" />
-                    <span className="h-9 w-1/3 rounded-xl bg-white/60" />
+                  <div aria-hidden className={`flex h-28 items-end gap-2 border-b border-carbon p-4 ${noteColor(board.id)}`}>
+                    <span className="h-14 w-1/3 rounded-2xl border border-carbon bg-paper" />
+                    <span className="h-20 w-1/3 rounded-2xl border border-carbon bg-paper" />
+                    <span className="h-10 w-1/3 rounded-2xl border border-carbon bg-paper" />
                   </div>
                   <div className="p-5">
-                    <span className="text-lg font-bold group-hover:text-accent">{board.title}</span>
-                    <span className="mt-1 flex items-center gap-2 text-xs text-muted">
-                      <span className="rounded-full bg-surface-muted px-2 py-0.5 font-semibold capitalize">{board.role.toLowerCase()}</span>
+                    <span className="text-xl font-bold">{board.title}</span>
+                    <span className="mt-2 flex items-center gap-2 text-xs">
+                      <span className="label rounded-full border border-carbon px-2.5 py-0.5 uppercase">{board.role.toLowerCase()}</span>
                       updated {new Date(board.updatedAt).toLocaleDateString()}
                     </span>
                   </div>

@@ -1,11 +1,12 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
+// Actions are black-filled or black-outlined pills, never a brand colour.
 const buttonVariants = {
-  primary: "bg-accent text-accent-foreground shadow-[0_2px_0_rgba(0,0,0,0.12)] hover:-translate-y-px hover:shadow-[0_4px_0_rgba(0,0,0,0.12)]",
-  secondary: "bg-surface text-foreground ring-1 ring-border hover:bg-surface-muted",
-  ghost: "text-muted hover:text-foreground hover:bg-surface-muted",
-  danger: "text-danger hover:bg-surface-muted",
-  inverse: "bg-ink text-ink-foreground hover:opacity-90",
+  primary: "bg-carbon text-paper border border-carbon hover:bg-paper hover:text-carbon",
+  secondary: "bg-paper text-carbon border border-carbon hover:bg-sky-wash",
+  ghost: "border border-transparent text-carbon hover:border-carbon",
+  danger: "border border-carbon bg-paper text-danger hover:bg-mist",
+  inverse: "bg-paper text-carbon border border-carbon hover:bg-sunburst",
 };
 
 export type ButtonVariant = keyof typeof buttonVariants;
@@ -17,7 +18,7 @@ export function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${buttonVariants[variant]} ${className}`}
+      className={`label inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${buttonVariants[variant]} ${className}`}
       {...props}
     />
   );
@@ -26,7 +27,7 @@ export function Button({
 export function Input({ className = "", ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
-      className={`w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted focus:border-accent focus:ring-4 focus:ring-accent/15 ${className}`}
+      className={`w-full rounded-full border border-carbon bg-paper px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted focus:bg-sky-wash ${className}`}
       {...props}
     />
   );
@@ -34,16 +35,16 @@ export function Input({ className = "", ...props }: InputHTMLAttributes<HTMLInpu
 
 export function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
-    <label className="flex flex-col gap-1.5 text-sm font-medium">
+    <label className="flex flex-col gap-1.5 text-sm font-bold">
       {label}
       {children}
-      {error && <span className="text-xs font-normal text-danger">{error}</span>}
+      {error && <span className="text-xs font-medium text-danger">{error}</span>}
     </label>
   );
 }
 
-/** Sticky-note colours, picked deterministically from an id so a list keeps its colour everywhere. */
-export const noteColors = ["bg-note-yellow", "bg-note-mint", "bg-note-sky", "bg-note-pink", "bg-note-lilac", "bg-note-orange"] as const;
+/** The sticker palette, minus violet (which needs white text). Picked by position or a stable id. */
+export const noteColors = ["bg-sunburst", "bg-mint-pop", "bg-lavender", "bg-electric-blue", "bg-ember"] as const;
 
 export function noteColor(seed: string) {
   let hash = 0;
@@ -61,21 +62,29 @@ export function Avatar({ name, title, size = "md" }: { name: string; title?: str
   return (
     <span
       title={title ?? name}
-      className={`inline-flex items-center justify-center rounded-full border-2 border-surface font-bold text-note-ink ${noteColor(name)} ${size === "sm" ? "size-6 text-[10px]" : "size-8 text-xs"}`}
+      className={`inline-flex items-center justify-center rounded-full border border-carbon font-bold text-carbon ${noteColor(name)} ${size === "sm" ? "size-6 text-[10px]" : "size-8 text-xs"}`}
     >
       {initials}
     </span>
   );
 }
 
+/** Circular black-outlined badge with three sticker bars: the board, in miniature. */
+export function LogoMark({ className = "size-9" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden className={className}>
+      <circle cx="32" cy="32" r="30" fill="#fff" stroke="#000" strokeWidth="2.5" />
+      <rect x="17" y="18" width="8" height="28" rx="4" fill="#ffd731" stroke="#000" strokeWidth="2" />
+      <rect x="28" y="18" width="8" height="20" rx="4" fill="#fb4903" stroke="#000" strokeWidth="2" />
+      <rect x="39" y="18" width="8" height="13" rx="4" fill="#55db9c" stroke="#000" strokeWidth="2" />
+    </svg>
+  );
+}
+
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2 whitespace-nowrap font-bold tracking-tight ${className}`}>
-      <span aria-hidden className="grid size-7 grid-cols-3 gap-0.5 rounded-lg bg-ink p-1.5">
-        <span className="rounded-sm bg-note-yellow" />
-        <span className="rounded-sm bg-accent" style={{ height: "70%" }} />
-        <span className="rounded-sm bg-note-mint" style={{ height: "45%" }} />
-      </span>
+    <span className={`inline-flex items-center gap-2 whitespace-nowrap text-[15px] font-bold tracking-tight ${className}`}>
+      <LogoMark />
       Realtime Board
     </span>
   );
@@ -84,15 +93,15 @@ export function Logo({ className = "" }: { className?: string }) {
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-ink/40 px-4 pt-24 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-carbon/30 px-4 pt-24"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
       role="presentation"
     >
-      <div role="dialog" aria-modal="true" aria-label={title} className="w-full max-w-lg rounded-3xl border border-border bg-surface p-6 shadow-2xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">{title}</h2>
-          <Button variant="ghost" className="px-2.5" onClick={onClose} aria-label="Close">
+      <div role="dialog" aria-modal="true" aria-label={title} className="w-full max-w-lg rounded-[30px] border border-carbon bg-paper p-6">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="display text-3xl">{title}</h2>
+          <Button variant="secondary" className="size-9 px-0" onClick={onClose} aria-label="Close">
             ✕
           </Button>
         </div>

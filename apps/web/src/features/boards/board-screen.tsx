@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { comparePositions, type BoardDto } from "@board/shared";
-import { Avatar, Button, Input, noteColors } from "@/components/ui";
+import { Avatar, Button, Input, LogoMark, noteColors } from "@/components/ui";
 import { ActivityPanel } from "./activity-panel";
 import { cardsInList, planMove } from "./board-state";
 import { CardDialog } from "./card-dialog";
@@ -33,7 +33,7 @@ export function BoardScreen({ boardId }: { boardId: string }) {
     return (
       <div className="p-8">
         <p className="text-sm text-danger">{board.error.message}</p>
-        <Link href="/boards" className="mt-2 inline-block text-sm text-accent hover:underline">Back to boards</Link>
+        <Link href="/boards" className="mt-2 inline-block text-sm font-bold underline underline-offset-4">Back to boards</Link>
       </div>
     );
   }
@@ -96,9 +96,9 @@ function Board({ board }: { board: BoardDto }) {
 
   return (
     <div className="flex h-dvh flex-col">
-      <header className="flex flex-wrap items-center gap-3 border-b border-border bg-surface px-4 py-2.5">
-        <Link href="/boards" className="rounded-full px-2 py-1 text-sm font-semibold text-muted hover:bg-surface-muted hover:text-foreground">← Boards</Link>
-        <span aria-hidden className="h-5 w-px bg-border" />
+      <header className="flex flex-wrap items-center gap-3 border-b border-carbon bg-paper px-4 py-2.5">
+        <Link href="/boards" aria-label="Boards"><LogoMark className="size-8" /></Link>
+        <Link href="/boards" className="label rounded-full border border-carbon px-3 py-1.5 text-xs hover:bg-sky-wash">← Boards</Link>
         <BoardTitle title={board.title} canEdit={canEdit} onRename={(title) => mutations.renameBoard.mutate(title)} />
         <ConnectionBadge state={connection} />
         <div className="ms-auto flex items-center gap-3">
@@ -111,16 +111,16 @@ function Board({ board }: { board: BoardDto }) {
       </header>
 
       {mutations.notice && (
-        <div role="status" className="flex items-center justify-between bg-note-yellow px-4 py-2 text-sm font-medium text-note-ink">
+        <div role="status" className="flex items-center justify-between border-b border-carbon bg-sunburst px-4 py-2 text-sm font-bold">
           {mutations.notice}
           <Button variant="ghost" onClick={mutations.dismissNotice}>Dismiss</Button>
         </div>
       )}
-      {!canEdit && <p className="bg-note-sky/40 px-4 py-2 text-sm font-medium">You can view this board but not change it.</p>}
+      {!canEdit && <p className="border-b border-carbon bg-lavender px-4 py-2 text-sm font-bold">You can view this board but not change it.</p>}
 
       <div className="flex min-h-0 flex-1">
         <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDraggingId(null)}>
-          <div className="dot-grid flex flex-1 items-start gap-4 overflow-x-auto p-5">
+          <div className="flex flex-1 items-start gap-4 overflow-x-auto bg-sky-wash p-5">
             {lists.map((list, i) => (
               <ListColumn
                 key={list.id}
@@ -141,7 +141,7 @@ function Board({ board }: { board: BoardDto }) {
                   onChange={(e) => setNewList(e.target.value)}
                   placeholder="+ Add a list"
                   maxLength={100}
-                  className="border-2 border-dashed bg-surface/70"
+                  className="border-dashed"
                 />
               </form>
             )}
@@ -170,8 +170,8 @@ function BoardTitle({ title, canEdit, onRename }: { title: string; canEdit: bool
   const [editing, setEditing] = useState(false);
   if (!editing) {
     return (
-      <h1 className="text-lg font-extrabold tracking-tight">
-        <button type="button" disabled={!canEdit} onClick={() => setEditing(true)} className="rounded-lg px-1.5 enabled:hover:bg-surface-muted">{title}</button>
+      <h1 className="text-xl font-bold tracking-tight">
+        <button type="button" disabled={!canEdit} onClick={() => setEditing(true)} className="rounded-full px-2 enabled:hover:bg-sky-wash">{title}</button>
       </h1>
     );
   }
@@ -190,17 +190,19 @@ function BoardTitle({ title, canEdit, onRename }: { title: string; canEdit: bool
 }
 
 function ConnectionBadge({ state }: { state: ConnectionState }) {
-  const styles: Record<ConnectionState, string> = {
-    live: "bg-emerald-500",
-    connecting: "bg-amber-400",
-    offline: "bg-red-500",
+  const fills: Record<ConnectionState, string> = {
+    live: "bg-paper",
+    connecting: "bg-sunburst",
+    offline: "bg-ember",
   };
   const labels: Record<ConnectionState, string> = { live: "Live", connecting: "Connecting…", offline: "Offline, retrying" };
   return (
-    <span role="status" aria-label={`Connection: ${labels[state]}`} className="flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-muted">
-      <span className={`size-2 rounded-full ${styles[state]} ${state === "live" ? "animate-pulse-ring" : ""}`} /> {labels[state]}
+    <span
+      role="status"
+      aria-label={`Connection: ${labels[state]}`}
+      className={`label flex items-center gap-1.5 rounded-full border border-carbon px-2.5 py-1 text-[11px] uppercase ${fills[state]}`}
+    >
+      <span className={`size-2 rounded-full bg-carbon ${state === "live" ? "" : "opacity-40"}`} /> {labels[state]}
     </span>
   );
 }
-
-

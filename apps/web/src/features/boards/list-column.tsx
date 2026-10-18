@@ -43,7 +43,7 @@ export function ListColumn({ list, color, cards, canEdit, onAddCard, onRename, o
   return (
     <section
       aria-label={list.title}
-      className={`flex w-72 shrink-0 flex-col rounded-3xl bg-surface-muted/90 p-3 shadow-sm ring-1 ring-border/60 backdrop-blur ${isOver ? "ring-2 ring-accent" : ""}`}
+      className={`flex w-72 shrink-0 flex-col rounded-[20px] border border-carbon p-3 ${isOver ? "bg-sunburst" : "bg-paper"}`}
     >
       <header className="mb-3 flex items-center justify-between gap-2">
         {editingTitle ? (
@@ -52,9 +52,9 @@ export function ListColumn({ list, color, cards, canEdit, onAddCard, onRename, o
           </form>
         ) : (
           <h2 className="flex items-center gap-2 px-1 text-sm font-bold">
-            <span aria-hidden className={`size-2.5 rounded-full ${color}`} />
+            <span aria-hidden className={`size-3 rounded-full border border-carbon ${color}`} />
             <button type="button" disabled={!canEdit} onClick={() => setEditingTitle(true)}>{list.title}</button>
-            <span className="rounded-full bg-surface px-2 py-0.5 text-xs font-semibold text-muted">{cards.length}</span>
+            <span className="rounded-full border border-carbon px-2 py-0.5 text-[11px] font-bold">{cards.length}</span>
           </h2>
         )}
         {canEdit && (
@@ -84,7 +84,7 @@ export function ListColumn({ list, color, cards, canEdit, onAddCard, onRename, o
             onChange={(e) => setDraft(e.target.value)}
             placeholder="+ Add a card"
             maxLength={200}
-            className="border-transparent bg-transparent hover:bg-surface"
+            className="border-dashed"
           />
         </form>
       )}

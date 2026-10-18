@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { loginSchema, registerSchema } from "@board/shared";
 import { Button, Field, Input, Logo } from "@/components/ui";
+import { Ribbon, Sticker } from "../landing/stickers";
 import { ApiError } from "@/lib/api-client";
 import { authApi } from "./auth-api";
 import { DemoButton } from "./demo-button";
@@ -49,12 +50,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
   return (
     <div className="grid flex-1 lg:grid-cols-2">
-      <div className="mx-auto flex w-full max-w-sm flex-col justify-center px-4 py-12">
+      <div className="mx-auto flex w-full max-w-sm flex-col justify-center px-5 py-12">
         <Link href="/" className="mb-10" aria-label="Realtime Board home">
           <Logo />
         </Link>
-        <h1 className="text-3xl font-extrabold tracking-tight">{mode === "login" ? "Welcome back" : "Create your account"}</h1>
-        <p className="mt-2 text-muted">
+        <h1 className="display text-5xl">{mode === "login" ? "Welcome back" : "Join the board"}</h1>
+        <p className="mt-4 text-muted">
           {mode === "login" ? "Sign in to see your boards." : "Boards are free. Invite your team after."}
         </p>
 
@@ -81,19 +82,19 @@ export function AuthForm({ mode }: { mode: Mode }) {
           </Button>
         </form>
 
-        <div className="my-6 flex items-center gap-3 text-xs text-muted">
-          <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+        <div className="label my-6 flex items-center gap-3 text-xs uppercase">
+          <span className="h-px flex-1 bg-carbon" /> or <span className="h-px flex-1 bg-carbon" />
         </div>
         <DemoButton variant="secondary" />
 
         <p className="mt-8 text-center text-sm text-muted">
           {mode === "login" ? (
             <>
-              New here? <Link className="text-accent hover:underline" href="/register">Create an account</Link>
+              New here? <Link className="font-bold underline underline-offset-4" href="/register">Create an account</Link>
             </>
           ) : (
             <>
-              Already have an account? <Link className="text-accent hover:underline" href="/login">Sign in</Link>
+              Already have an account? <Link className="font-bold underline underline-offset-4" href="/login">Sign in</Link>
             </>
           )}
         </p>
@@ -103,27 +104,29 @@ export function AuthForm({ mode }: { mode: Mode }) {
   );
 }
 
-const asideNotes = [
-  { text: "Ship v1 🎉", color: "bg-note-yellow", rotate: "-rotate-3" },
-  { text: "Record walkthrough", color: "bg-note-sky", rotate: "rotate-2" },
-  { text: "Pricing page", color: "bg-note-mint", rotate: "-rotate-1" },
-  { text: "Design review", color: "bg-note-pink", rotate: "rotate-3" },
-];
-
 function AuthAside() {
   return (
-    <aside aria-hidden className="dot-grid relative hidden overflow-hidden bg-ink text-ink-foreground lg:flex lg:flex-col lg:justify-center lg:px-16">
-      <div className="grid max-w-md grid-cols-2 gap-4">
-        {asideNotes.map((note) => (
-          <div key={note.text} className={`rounded-2xl ${note.color} ${note.rotate} p-5 font-bold text-note-ink shadow-xl`}>
-            {note.text}
-          </div>
-        ))}
-      </div>
-      <p className="mt-12 max-w-md text-2xl font-bold leading-snug">
-        &ldquo;Drag a card in one window and watch it move in the other.&rdquo;
+    <aside aria-hidden className="relative hidden overflow-hidden border-s border-carbon bg-sky-wash lg:flex lg:flex-col lg:justify-center lg:px-16">
+      <Ribbon className="inset-x-0 top-[45%] h-[40%] w-full" />
+      <p className="display relative z-10 text-[clamp(4rem,7vw,7.5rem)]">
+        Drag it.
+        <br />
+        Everyone
+        <br />
+        sees it.
       </p>
-      <p className="mt-3 text-sm opacity-60">Live updates over WebSockets, conflict-safe edits, roles that hold.</p>
+      <Sticker className="end-12 top-16 rotate-6 bg-sunburst px-4 py-3">
+        <span className="block text-sm font-bold">Ship v1</span>
+        <span className="text-xs">moved to Doing</span>
+      </Sticker>
+      <Sticker className="bottom-16 start-16 -rotate-6 bg-ember px-4 py-2">
+        <span className="label flex items-center gap-2 text-sm uppercase">
+          <span className="size-2.5 rounded-full border border-carbon bg-paper" /> Live
+        </span>
+      </Sticker>
+      <Sticker className="bottom-28 end-20 rotate-[8deg] bg-lavender px-3 py-2">
+        <span className="text-sm font-bold">Omar is here</span>
+      </Sticker>
     </aside>
   );
 }

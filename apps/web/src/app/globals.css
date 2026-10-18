@@ -1,122 +1,94 @@
 @import "tailwindcss";
 
-/* Realtime Board: warm paper, coral ink and sticky-note colours. */
+/*
+ * Realtime Board design system, after Refero's "Slush" style: a sticker book on pastel paper.
+ * Black 1px outlines on everything interactive, pill controls, a shared six-colour sticker palette,
+ * enormous display type with crushed leading. No gradients, no shadows: depth comes from colour bands and outlines.
+ */
 :root {
-  --background: #fbf8f3;
-  --surface: #ffffff;
-  --surface-muted: #f3eee6;
-  --foreground: #1f1b16;
-  --muted: #6f675c;
-  --border: #e8e0d4;
-  --accent: #ff5a36;
-  --accent-foreground: #ffffff;
-  --ink: #1f1b16;
-  --ink-foreground: #fbf8f3;
-  --danger: #d92d20;
-  --note-yellow: #ffd75e;
-  --note-mint: #6fdcae;
-  --note-sky: #8cc8ff;
-  --note-pink: #ff9fc6;
-  --note-lilac: #c4b5fd;
-  --note-orange: #ffb27a;
-  /* Text on sticky notes: notes stay light in dark mode, so this doesn't flip. */
-  --note-ink: #1f1b16;
-}
+  color-scheme: light;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #14110f;
-    --surface: #1e1a17;
-    --surface-muted: #2a2420;
-    --foreground: #f5efe7;
-    --muted: #a99f92;
-    --border: #3a322c;
-    --accent: #ff7a59;
-    --accent-foreground: #1a0d08;
-    --ink: #f5efe7;
-    --ink-foreground: #14110f;
-    --danger: #f97066;
-  }
+  /* Neutrals */
+  --carbon: #000000;
+  --paper: #ffffff;
+  --sky-wash: #dceeff;
+  --concrete: #cccccc;
+  --mist: #e9e9e9;
+  --ink-soft: #3d3d3d;
+
+  /* Sticker palette: used together, never one as "the" accent. Blue is decorative only, never an action colour. */
+  --electric-blue: #4da2ff;
+  --mint-pop: #55db9c;
+  --lavender: #e9ccff;
+  --ember: #fb4903;
+  --sunburst: #ffd731;
+  --voltage-violet: #5c4ade;
+
+  --danger: #c4320a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-ink: var(--ink);
-  --color-ink-foreground: var(--ink-foreground);
+  /* Semantic roles used across the app */
+  --color-background: var(--paper);
+  --color-surface: var(--paper);
+  --color-surface-muted: var(--mist);
+  --color-foreground: var(--carbon);
+  --color-muted: var(--ink-soft);
+  --color-border: var(--carbon);
+  --color-accent: var(--carbon);
+  --color-accent-foreground: var(--paper);
   --color-danger: var(--danger);
-  --color-note-yellow: var(--note-yellow);
-  --color-note-mint: var(--note-mint);
-  --color-note-sky: var(--note-sky);
-  --color-note-pink: var(--note-pink);
-  --color-note-lilac: var(--note-lilac);
-  --color-note-orange: var(--note-orange);
-  --color-note-ink: var(--note-ink);
-  --font-sans: var(--font-bricolage);
+
+  /* Raw palette */
+  --color-carbon: var(--carbon);
+  --color-paper: var(--paper);
+  --color-sky-wash: var(--sky-wash);
+  --color-concrete: var(--concrete);
+  --color-mist: var(--mist);
+  --color-electric-blue: var(--electric-blue);
+  --color-mint-pop: var(--mint-pop);
+  --color-lavender: var(--lavender);
+  --color-ember: var(--ember);
+  --color-sunburst: var(--sunburst);
+  --color-voltage-violet: var(--voltage-violet);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-bowlby);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--paper);
+  color: var(--carbon);
   font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-feature-settings: "ss01" on, "tnum" on;
 }
 
-/* Dotted "whiteboard" background used behind the hero and the board. */
-.dot-grid {
-  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 14%, transparent) 1px, transparent 1px);
-  background-size: 22px 22px;
+/* Display type is sculptural: heavy, uppercase, crushed line-height. */
+.display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.8;
+  letter-spacing: 0;
 }
 
-/* Landing hero: a card travels from "To do" to "Doing" while two cursors move around. */
-@keyframes card-travel {
-  0%, 18% { transform: translate(0, 0) rotate(0deg); }
-  30% { transform: translate(40%, -14px) rotate(3deg); }
-  48%, 82% { transform: translate(calc(100% + 1rem), 0) rotate(0deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
+/* Nav, button and label text gets a little air. */
+.label {
+  font-weight: 700;
+  letter-spacing: 0.032em;
 }
 
-@keyframes cursor-a {
-  0%, 16% { transform: translate(0, 0); }
-  48%, 82% { transform: translate(calc(100% + 1rem), 4px); }
-  100% { transform: translate(0, 0); }
+/* The only animation in the system: a continuous marquee strip. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
-@keyframes cursor-b {
-  0% { transform: translate(0, 0); }
-  35% { transform: translate(-40px, 30px); }
-  70% { transform: translate(20px, 60px); }
-  100% { transform: translate(0, 0); }
-}
-
-@keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, #22c55e 55%, transparent); }
-  100% { box-shadow: 0 0 0 8px transparent; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.animate-card-travel { animation: card-travel 7s ease-in-out infinite; }
-.animate-cursor-a { animation: cursor-a 7s ease-in-out infinite; }
-.animate-cursor-b { animation: cursor-b 9s ease-in-out infinite; }
-.animate-pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }
-.animate-float { animation: float 5s ease-in-out infinite; }
+.animate-marquee { animation: marquee 30s linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-card-travel,
-  .animate-cursor-a,
-  .animate-cursor-b,
-  .animate-pulse-ring,
-  .animate-float {
-    animation: none;
-  }
+  .animate-marquee { animation: none; }
 }

@@ -27,11 +27,11 @@ export function CardDialog({ card, canEdit, onSave, onDelete, onClose }: Props) 
   return (
     <Modal title={canEdit ? "Edit card" : card.title} onClose={onClose}>
       {changedElsewhere && (
-        <p className="mb-4 rounded-lg bg-surface-muted px-3 py-2 text-sm">
+        <p className="mb-4 rounded-2xl border border-carbon bg-sunburst px-4 py-3 text-sm font-semibold">
           Someone just changed this card.{" "}
           <button
             type="button"
-            className="text-accent hover:underline"
+            className="font-bold underline underline-offset-4"
             onClick={() => {
               setTitle(card.title);
               setDescription(card.description);
@@ -52,7 +52,7 @@ export function CardDialog({ card, canEdit, onSave, onDelete, onClose }: Props) 
             disabled={!canEdit}
             rows={6}
             maxLength={5000}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="w-full rounded-2xl border border-carbon bg-paper px-4 py-3 text-sm outline-none focus:bg-sky-wash"
           />
         </Field>
         {canEdit && (

@@ -34,7 +34,7 @@ export function InviteDialog({ board, onClose }: { board: BoardDto; onClose: () 
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as "EDITOR" | "VIEWER")}
-            className="rounded-lg border border-border bg-surface px-3 text-sm"
+            className="rounded-full border border-carbon bg-paper px-3 text-sm font-bold"
             aria-label="Role"
           >
             <option value="EDITOR">Can edit</option>
@@ -48,7 +48,7 @@ export function InviteDialog({ board, onClose }: { board: BoardDto; onClose: () 
           <li key={m.user.id} className="flex items-center gap-3 text-sm">
             <Avatar name={m.user.name} />
             <span className="flex-1">{m.user.name} <span className="text-muted">{m.user.email}</span></span>
-            <span className="text-xs text-muted">{m.role.toLowerCase()}</span>
+            <span className="label rounded-full border border-carbon px-2 py-0.5 text-[10px] uppercase">{m.role.toLowerCase()}</span>
           </li>
         ))}
       </ul>
