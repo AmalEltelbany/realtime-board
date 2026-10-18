@@ -1,0 +1,20 @@
+# Render Blueprint for the API. The database lives on Neon (free Postgres); paste its URL into DATABASE_URL.
+services:
+  - type: web
+    name: realtime-board-api
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @board/shared build && pnpm --filter api build
+    startCommand: pnpm --filter api db:deploy && node apps/api/dist/main.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: WEB_ORIGIN
+        sync: false

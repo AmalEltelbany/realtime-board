@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: board
+          POSTGRES_PASSWORD: board
+          POSTGRES_DB: board_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U board" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://board:board@localhost:5432/board_test?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build shared package
+        run: pnpm --filter @board/shared build
+      - name: Shared unit tests
+        run: pnpm --filter @board/shared test
+
+      - name: API lint and typecheck
+        run: pnpm --filter api lint && pnpm --filter api typecheck
+      - name: API migrations
+        run: pnpm --filter api db:deploy
+      - name: API unit tests
+        run: pnpm --filter api test
+      - name: API end-to-end tests (real Postgres and sockets)
+        run: pnpm --filter api test:e2e
+
+      - name: Web lint, typecheck and unit tests
+        run: pnpm --filter web lint && pnpm --filter web typecheck && pnpm --filter web test
+
+      - name: Build
+        run: pnpm --filter api build && pnpm --filter web build
+        env:
+          API_URL: http://localhost:4000
+          NEXT_PUBLIC_SOCKET_URL: http://localhost:4000
+
+      - name: Browser tests (two users, live collaboration)
+        run: pnpm --filter @board/e2e exec playwright install --with-deps chromium && pnpm --filter @board/e2e test:browser
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: e2e/test-results
