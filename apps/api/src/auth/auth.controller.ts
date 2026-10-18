@@ -1,8 +1,8 @@
 import { Body, Controller, Get, HttpCode, Post, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { loginSchema, registerSchema, type LoginInput, type RegisterInput, type UserDto } from '@board/shared';
+import { RateLimit } from '../common/rate-limit.js';
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import { CurrentUser, type AuthUser } from '../common/request-context.js';
 import type { Env } from '../config/env.js';
@@ -12,7 +12,7 @@ import { SESSION_COOKIE, sessionCookieOptions } from './session-cookie.js';
 import { TokensService } from './tokens.service.js';
 
 @Controller('auth')
-@Throttle({ default: { limit: 10, ttl: 60_000 } })
+@RateLimit(10)
 export class AuthController {
   constructor(
     private readonly auth: AuthService,
@@ -42,7 +42,7 @@ export class AuthController {
   }
 
   @Post('demo')
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @RateLimit(5)
   async demo(@Res({ passthrough: true }) res: Response): Promise<UserDto> {
     const user = await this.auth.createDemoUser();
     await this.startSession(res, user);

@@ -62,6 +62,8 @@ e2e            Playwright: two browsers collaborating on one board
 
 **Authorisation in one place.** `BoardAccessService.requireRole()` is called by every board read and write and by the socket `join`. Non-members get 404 rather than 403, so board ids can't be probed.
 
+**Rate limits without a CommonJS dependency.** Auth routes are rate limited per IP by a small guard (`common/rate-limit.ts`). `@nestjs/throttler` is still CommonJS, and Vercel's runtime can't `require()` the ESM-only Nest 12 from it. The guard counts in memory, so each serverless instance has its own counter: good enough to slow down brute force, not an exact global limit.
+
 **Shared contracts.** Request schemas and event types live in `packages/shared`. The API validates with the same Zod schemas the forms use, and a change to an event type breaks the build on both sides instead of at runtime.
 
 ### Known limits and what I'd do next
