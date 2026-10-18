@@ -1,28 +1,41 @@
 @import "tailwindcss";
 
+/* Realtime Board: warm paper, coral ink and sticky-note colours. */
 :root {
-  --background: #f6f5fb;
+  --background: #fbf8f3;
   --surface: #ffffff;
-  --surface-muted: #eeecf6;
-  --foreground: #1c1a29;
-  --muted: #6b6880;
-  --border: #e2dfee;
-  --accent: #7c3aed;
+  --surface-muted: #f3eee6;
+  --foreground: #1f1b16;
+  --muted: #6f675c;
+  --border: #e8e0d4;
+  --accent: #ff5a36;
   --accent-foreground: #ffffff;
-  --danger: #dc2626;
+  --ink: #1f1b16;
+  --ink-foreground: #fbf8f3;
+  --danger: #d92d20;
+  --note-yellow: #ffd75e;
+  --note-mint: #6fdcae;
+  --note-sky: #8cc8ff;
+  --note-pink: #ff9fc6;
+  --note-lilac: #c4b5fd;
+  --note-orange: #ffb27a;
+  /* Text on sticky notes: notes stay light in dark mode, so this doesn't flip. */
+  --note-ink: #1f1b16;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f0d17;
-    --surface: #1a1726;
-    --surface-muted: #241f33;
-    --foreground: #ece9f7;
-    --muted: #a19cb8;
-    --border: #2f2943;
-    --accent: #a78bfa;
-    --accent-foreground: #140f22;
-    --danger: #f87171;
+    --background: #14110f;
+    --surface: #1e1a17;
+    --surface-muted: #2a2420;
+    --foreground: #f5efe7;
+    --muted: #a99f92;
+    --border: #3a322c;
+    --accent: #ff7a59;
+    --accent-foreground: #1a0d08;
+    --ink: #f5efe7;
+    --ink-foreground: #14110f;
+    --danger: #f97066;
   }
 }
 
@@ -35,8 +48,17 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
   --color-danger: var(--danger);
-  --font-sans: var(--font-geist-sans);
+  --color-note-yellow: var(--note-yellow);
+  --color-note-mint: var(--note-mint);
+  --color-note-sky: var(--note-sky);
+  --color-note-pink: var(--note-pink);
+  --color-note-lilac: var(--note-lilac);
+  --color-note-orange: var(--note-orange);
+  --color-note-ink: var(--note-ink);
+  --font-sans: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -44,4 +66,57 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Dotted "whiteboard" background used behind the hero and the board. */
+.dot-grid {
+  background-image: radial-gradient(color-mix(in srgb, var(--foreground) 14%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Landing hero: a card travels from "To do" to "Doing" while two cursors move around. */
+@keyframes card-travel {
+  0%, 18% { transform: translate(0, 0) rotate(0deg); }
+  30% { transform: translate(40%, -14px) rotate(3deg); }
+  48%, 82% { transform: translate(calc(100% + 1rem), 0) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes cursor-a {
+  0%, 16% { transform: translate(0, 0); }
+  48%, 82% { transform: translate(calc(100% + 1rem), 4px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes cursor-b {
+  0% { transform: translate(0, 0); }
+  35% { transform: translate(-40px, 30px); }
+  70% { transform: translate(20px, 60px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, #22c55e 55%, transparent); }
+  100% { box-shadow: 0 0 0 8px transparent; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-card-travel { animation: card-travel 7s ease-in-out infinite; }
+.animate-cursor-a { animation: cursor-a 7s ease-in-out infinite; }
+.animate-cursor-b { animation: cursor-b 9s ease-in-out infinite; }
+.animate-pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }
+.animate-float { animation: float 5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-card-travel,
+  .animate-cursor-a,
+  .animate-cursor-b,
+  .animate-pulse-ring,
+  .animate-float {
+    animation: none;
+  }
 }

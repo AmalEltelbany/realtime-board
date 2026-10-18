@@ -11,6 +11,8 @@ export const listDropId = (listId: string) => `list:${listId}`;
 
 interface Props {
   list: ListDto;
+  /** Sticky-note colour, assigned by the list's position on the board. */
+  color: string;
   cards: CardDto[];
   canEdit: boolean;
   onAddCard: (title: string) => void;
@@ -19,7 +21,7 @@ interface Props {
   onOpenCard: (cardId: string) => void;
 }
 
-export function ListColumn({ list, cards, canEdit, onAddCard, onRename, onDelete, onOpenCard }: Props) {
+export function ListColumn({ list, color, cards, canEdit, onAddCard, onRename, onDelete, onOpenCard }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id: listDropId(list.id), disabled: !canEdit });
   const [draft, setDraft] = useState("");
   const [editingTitle, setEditingTitle] = useState(false);
@@ -41,7 +43,7 @@ export function ListColumn({ list, cards, canEdit, onAddCard, onRename, onDelete
   return (
     <section
       aria-label={list.title}
-      className={`flex w-72 shrink-0 flex-col rounded-xl bg-surface-muted p-3 ${isOver ? "ring-2 ring-accent" : ""}`}
+      className={`flex w-72 shrink-0 flex-col rounded-3xl bg-surface-muted/90 p-3 shadow-sm ring-1 ring-border/60 backdrop-blur ${isOver ? "ring-2 ring-accent" : ""}`}
     >
       <header className="mb-3 flex items-center justify-between gap-2">
         {editingTitle ? (
@@ -49,9 +51,10 @@ export function ListColumn({ list, cards, canEdit, onAddCard, onRename, onDelete
             <Input name="title" defaultValue={list.title} autoFocus onBlur={(e) => e.currentTarget.form?.requestSubmit()} />
           </form>
         ) : (
-          <h2 className="text-sm font-semibold">
+          <h2 className="flex items-center gap-2 px-1 text-sm font-bold">
+            <span aria-hidden className={`size-2.5 rounded-full ${color}`} />
             <button type="button" disabled={!canEdit} onClick={() => setEditingTitle(true)}>{list.title}</button>
-            <span className="ms-2 text-xs font-normal text-muted">{cards.length}</span>
+            <span className="rounded-full bg-surface px-2 py-0.5 text-xs font-semibold text-muted">{cards.length}</span>
           </h2>
         )}
         {canEdit && (
@@ -69,14 +72,20 @@ export function ListColumn({ list, cards, canEdit, onAddCard, onRename, onDelete
       <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
         <ul ref={setNodeRef} className="flex min-h-12 flex-col gap-2">
           {cards.map((card) => (
-            <CardTile key={card.id} card={card} canEdit={canEdit} onOpen={() => onOpenCard(card.id)} />
+            <CardTile key={card.id} card={card} canEdit={canEdit} color={color} onOpen={() => onOpenCard(card.id)} />
           ))}
         </ul>
       </SortableContext>
 
       {canEdit && (
         <form onSubmit={addCard} className="mt-3">
-          <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="+ Add a card" maxLength={200} />
+          <Input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="+ Add a card"
+            maxLength={200}
+            className="border-transparent bg-transparent hover:bg-surface"
+          />
         </form>
       )}
     </section>

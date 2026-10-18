@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { comparePositions, type BoardDto } from "@board/shared";
-import { Avatar, Button, Input } from "@/components/ui";
+import { Avatar, Button, Input, noteColors } from "@/components/ui";
 import { ActivityPanel } from "./activity-panel";
 import { cardsInList, planMove } from "./board-state";
 import { CardDialog } from "./card-dialog";
@@ -96,34 +96,36 @@ function Board({ board }: { board: BoardDto }) {
 
   return (
     <div className="flex h-dvh flex-col">
-      <header className="flex flex-wrap items-center gap-3 border-b border-border bg-surface px-4 py-3">
-        <Link href="/boards" className="text-sm text-muted hover:text-foreground">← Boards</Link>
+      <header className="flex flex-wrap items-center gap-3 border-b border-border bg-surface px-4 py-2.5">
+        <Link href="/boards" className="rounded-full px-2 py-1 text-sm font-semibold text-muted hover:bg-surface-muted hover:text-foreground">← Boards</Link>
+        <span aria-hidden className="h-5 w-px bg-border" />
         <BoardTitle title={board.title} canEdit={canEdit} onRename={(title) => mutations.renameBoard.mutate(title)} />
         <ConnectionBadge state={connection} />
         <div className="ms-auto flex items-center gap-3">
           <div className="flex -space-x-2" aria-label="People viewing this board">
             {viewers.map((v) => <Avatar key={v.id} name={v.name} title={`${v.name} is viewing`} />)}
           </div>
-          {board.role === "OWNER" && <Button variant="secondary" onClick={() => setInviteOpen(true)}>Share</Button>}
-          <Button variant="ghost" onClick={() => setShowActivity((v) => !v)}>Activity</Button>
+          {board.role === "OWNER" && <Button onClick={() => setInviteOpen(true)}>Share</Button>}
+          <Button variant="secondary" aria-pressed={showActivity} onClick={() => setShowActivity((v) => !v)}>Activity</Button>
         </div>
       </header>
 
       {mutations.notice && (
-        <div role="status" className="flex items-center justify-between bg-surface-muted px-4 py-2 text-sm">
+        <div role="status" className="flex items-center justify-between bg-note-yellow px-4 py-2 text-sm font-medium text-note-ink">
           {mutations.notice}
           <Button variant="ghost" onClick={mutations.dismissNotice}>Dismiss</Button>
         </div>
       )}
-      {!canEdit && <p className="bg-surface-muted px-4 py-2 text-sm text-muted">You can view this board but not change it.</p>}
+      {!canEdit && <p className="bg-note-sky/40 px-4 py-2 text-sm font-medium">You can view this board but not change it.</p>}
 
       <div className="flex min-h-0 flex-1">
         <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDraggingId(null)}>
-          <div className="flex flex-1 items-start gap-4 overflow-x-auto p-4">
-            {lists.map((list) => (
+          <div className="dot-grid flex flex-1 items-start gap-4 overflow-x-auto p-5">
+            {lists.map((list, i) => (
               <ListColumn
                 key={list.id}
                 list={list}
+                color={noteColors[i % noteColors.length]}
                 cards={cardsInList(board, list.id)}
                 canEdit={canEdit}
                 onAddCard={(title) => mutations.createCard.mutate({ listId: list.id, title })}
@@ -134,7 +136,13 @@ function Board({ board }: { board: BoardDto }) {
             ))}
             {canEdit && (
               <form onSubmit={addList} className="w-72 shrink-0">
-                <Input value={newList} onChange={(e) => setNewList(e.target.value)} placeholder="+ Add a list" maxLength={100} />
+                <Input
+                  value={newList}
+                  onChange={(e) => setNewList(e.target.value)}
+                  placeholder="+ Add a list"
+                  maxLength={100}
+                  className="border-2 border-dashed bg-surface/70"
+                />
               </form>
             )}
           </div>
@@ -162,8 +170,8 @@ function BoardTitle({ title, canEdit, onRename }: { title: string; canEdit: bool
   const [editing, setEditing] = useState(false);
   if (!editing) {
     return (
-      <h1 className="text-lg font-semibold">
-        <button type="button" disabled={!canEdit} onClick={() => setEditing(true)}>{title}</button>
+      <h1 className="text-lg font-extrabold tracking-tight">
+        <button type="button" disabled={!canEdit} onClick={() => setEditing(true)} className="rounded-lg px-1.5 enabled:hover:bg-surface-muted">{title}</button>
       </h1>
     );
   }
@@ -189,8 +197,8 @@ function ConnectionBadge({ state }: { state: ConnectionState }) {
   };
   const labels: Record<ConnectionState, string> = { live: "Live", connecting: "Connecting…", offline: "Offline, retrying" };
   return (
-    <span role="status" aria-label={`Connection: ${labels[state]}`} className="flex items-center gap-1.5 text-xs text-muted">
-      <span className={`size-2 rounded-full ${styles[state]}`} /> {labels[state]}
+    <span role="status" aria-label={`Connection: ${labels[state]}`} className="flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-muted">
+      <span className={`size-2 rounded-full ${styles[state]} ${state === "live" ? "animate-pulse-ring" : ""}`} /> {labels[state]}
     </span>
   );
 }
