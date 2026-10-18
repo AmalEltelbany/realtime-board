@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BoardRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  memberships  BoardMember[]
+  activities   Activity[]
+}
+
+model Board {
+  id        String        @id @default(cuid())
+  title     String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  members   BoardMember[]
+  lists     List[]
+  cards     Card[]
+  activity  Activity[]
+}
+
+model BoardMember {
+  boardId   String
+  userId    String
+  role      BoardRole
+  createdAt DateTime  @default(now())
+  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([boardId, userId])
+  @@index([userId])
+}
+
+/// `position` is a fractional index key (see @board/shared positions).
+/// The migration gives it COLLATE "C" so Postgres sorts it byte-wise, the same way JS compares strings.
+model List {
+  id        String   @id @default(cuid())
+  boardId   String
+  title     String
+  position  String
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards     Card[]
+
+  @@index([boardId, position])
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  boardId     String
+  listId      String
+  title       String
+  description String   @default("")
+  position    String
+  /// Bumped on every write; clients send it back for optimistic concurrency control.
+  version     Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  board       Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@index([listId, position])
+  @@index([boardId])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  boardId   String
+  actorId   String
+  summary   String
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  actor     User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([boardId, createdAt])
+}
