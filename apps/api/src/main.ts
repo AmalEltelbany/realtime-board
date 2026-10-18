@@ -1,15 +1,53 @@
+import { createServer, type Server } from 'node:http';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
 import { configureApp } from './bootstrap.js';
 
-async function bootstrap() {
+async function createApp() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const config = configureApp(app);
+  return { app, config: configureApp(app) };
+}
+
+/**
+ * On Vercel, the function's entry exports an http.Server and Vercel delivers both requests and
+ * WebSocket upgrades to it. Nest builds its own server asynchronously, so we export a server that
+ * exists immediately and forwards each event to Nest's once it's ready (Express and Socket.IO
+ * are both attached to Nest's server).
+ */
+function vercelServer(): Server {
+  const nest = createApp().then(async ({ app }) => {
+    await app.init();
+    return app.getHttpServer() as Server;
+  });
+  nest.catch((error: unknown) => console.error('API failed to start', error));
+  const server = createServer();
+  server.on('request', (req, res) => {
+    nest.then(
+      (inner) => inner.emit('request', req, res),
+      () => res.writeHead(503).end(),
+    );
+  });
+  server.on('upgrade', (req, socket, head) => {
+    nest.then(
+      (inner) => inner.emit('upgrade', req, socket, head),
+      () => socket.destroy(),
+    );
+  });
+  return server;
+}
+
+async function listen() {
+  const { app, config } = await createApp();
   await app.listen(config.get('PORT'));
 }
-// Not a top-level await: Vercel's runtime captures listen() and waits for this module to finish loading first.
-bootstrap().catch((error: unknown) => {
-  console.error(error);
-  process.exit(1);
-});
+
+export default process.env.VERCEL ? vercelServer() : undefined;
+
+if (!process.env.VERCEL) {
+  // Not a top-level await, so the module finishes loading before the server starts.
+  listen().catch((error: unknown) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
