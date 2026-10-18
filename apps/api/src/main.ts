@@ -1,6 +1,7 @@
 import { createServer, type Server } from 'node:http';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { createRequire } from 'node:module';
 import { AppModule } from './app.module.js';
 import { configureApp } from './bootstrap.js';
 
@@ -17,8 +18,19 @@ async function createApp() {
  */
 function vercelServer(): Server {
   const nest = createApp().then(async ({ app }) => {
+    // TEMP diagnostic: can @nestjs/core resolve its optional WebSocket module here?
+    try {
+      const fromCore = createRequire(import.meta.resolve('@nestjs/core'));
+      console.warn('ws-diag resolve', fromCore.resolve('@nestjs/websockets/socket-module'));
+      await import(fromCore.resolve('@nestjs/websockets/socket-module'));
+      console.warn('ws-diag import ok');
+    } catch (error) {
+      console.warn('ws-diag failed', String(error));
+    }
     await app.init();
-    return app.getHttpServer() as Server;
+    const inner = app.getHttpServer() as Server;
+    console.warn('ws-diag upgrade listeners', inner.listenerCount('upgrade'));
+    return inner;
   });
   nest.catch((error: unknown) => console.error('API failed to start', error));
   const server = createServer();
