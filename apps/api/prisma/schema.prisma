@@ -89,3 +89,13 @@ model Activity {
 
   @@index([boardId, createdAt])
 }
+
+/// Owned by @socket.io/postgres-adapter (large event payloads). Declared only so migrations don't drop it.
+model SocketIoAttachment {
+  id        BigInt    @unique @default(autoincrement())
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  payload   Bytes?
+
+  @@map("socket_io_attachments")
+  @@ignore
+}

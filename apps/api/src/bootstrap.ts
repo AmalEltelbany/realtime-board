@@ -12,7 +12,7 @@ export function configureApp(app: INestApplication) {
   (app as NestExpressApplication).set('trust proxy', 1);
   app.use(cookieParser());
   app.setGlobalPrefix('api');
-  app.useWebSocketAdapter(new SocketIoAdapter(app, config.get('WEB_ORIGIN')));
+  app.useWebSocketAdapter(new SocketIoAdapter(app, config.get('WEB_ORIGIN'), config.get('DATABASE_URL')));
   app.enableShutdownHooks();
   return config;
 }
