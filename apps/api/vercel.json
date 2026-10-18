@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile --config.node-linker=hoisted",
   "buildCommand": "cd ../.. && pnpm --filter @board/shared build && pnpm --filter api build && cd apps/api && npx prisma migrate deploy"
 }

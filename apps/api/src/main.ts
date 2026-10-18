@@ -1,7 +1,8 @@
 import { createServer, type Server } from 'node:http';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { createRequire } from 'node:module';
+// Nest loads this lazily with an optional import(); importing it here keeps it in the Vercel bundle.
+import '@nestjs/websockets/socket-module.js';
 import { AppModule } from './app.module.js';
 import { configureApp } from './bootstrap.js';
 
@@ -18,18 +19,9 @@ async function createApp() {
  */
 function vercelServer(): Server {
   const nest = createApp().then(async ({ app }) => {
-    // TEMP diagnostic: can @nestjs/core resolve its optional WebSocket module here?
-    try {
-      const fromCore = createRequire(import.meta.resolve('@nestjs/core'));
-      console.warn('ws-diag resolve', fromCore.resolve('@nestjs/websockets/socket-module'));
-      await import(fromCore.resolve('@nestjs/websockets/socket-module'));
-      console.warn('ws-diag import ok');
-    } catch (error) {
-      console.warn('ws-diag failed', String(error));
-    }
     await app.init();
     const inner = app.getHttpServer() as Server;
-    console.warn('ws-diag upgrade listeners', inner.listenerCount('upgrade'));
+    if (inner.listenerCount('upgrade') === 0) console.warn('No WebSocket upgrade handler is attached.');
     return inner;
   });
   nest.catch((error: unknown) => console.error('API failed to start', error));
