@@ -1,8 +1,10 @@
 import { createServer, type Server } from 'node:http';
+import { registerHooks } from 'node:module';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-// Nest loads this lazily with an optional import(); importing it here keeps it in the Vercel bundle.
-import '@nestjs/websockets/socket-module.js';
+// Nest loads its WebSocket module lazily, by a package subpath that Vercel's file tracer doesn't follow,
+// and silently runs without gateways if it's missing. A relative path is always traced.
+import '../node_modules/@nestjs/websockets/socket-module.js';
 import { AppModule } from './app.module.js';
 import { configureApp } from './bootstrap.js';
 
@@ -18,6 +20,15 @@ async function createApp() {
  * are both attached to Nest's server).
  */
 function vercelServer(): Server {
+  // Point Nest's lazy import at the copy imported above, which is in the bundle. import.meta.resolve
+  // returns the real path, so it's the same module instance the gateways' decorators use.
+  const socketModule = import.meta.resolve('../node_modules/@nestjs/websockets/socket-module.js');
+  registerHooks({
+    resolve: (specifier, context, next) =>
+      specifier === '@nestjs/websockets/socket-module.js'
+        ? { url: socketModule, shortCircuit: true }
+        : next(specifier, context),
+  });
   const nest = createApp().then(async ({ app }) => {
     await app.init();
     const inner = app.getHttpServer() as Server;
