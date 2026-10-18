@@ -8,4 +8,8 @@ async function bootstrap() {
   const config = configureApp(app);
   await app.listen(config.get('PORT'));
 }
-await bootstrap();
+// Not a top-level await: Vercel's runtime captures listen() and waits for this module to finish loading first.
+bootstrap().catch((error: unknown) => {
+  console.error(error);
+  process.exit(1);
+});
