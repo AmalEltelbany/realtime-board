@@ -27,7 +27,7 @@ flowchart LR
   subgraph Vercel
     Next[Next.js server<br/>rewrites /api/*]
   end
-  subgraph Render
+  subgraph Vercel functions
     API[NestJS API<br/>REST + Socket.IO]
   end
   DB[(PostgreSQL<br/>Neon)]
@@ -58,7 +58,7 @@ e2e            Playwright: two browsers collaborating on one board
 
 **Optimistic UI without echo loops.** Each tab has a client id it sends as `x-client-id`. Broadcasts carry it back as `originClientId`, so the tab that made a change ignores its own echo (it already applied it), while every other tab applies it. Older versions of a card arriving late are ignored.
 
-**Cookies that browsers don't block.** The web app (Vercel) and API (Render) are on different domains, and cross-site cookies are increasingly blocked. So the browser only talks REST to the web app's own domain, which proxies `/api/*` to the API: the httpOnly session cookie stays first-party. WebSockets can't go through that proxy, so the client trades its session for a 60-second socket token and connects directly. The two token types can't be used in place of each other.
+**Cookies that browsers don't block.** The web app and API are on different domains, and cross-site cookies are increasingly blocked. So the browser only talks REST to the web app's own domain, which proxies `/api/*` to the API: the httpOnly session cookie stays first-party. WebSockets can't go through that proxy, so the client trades its session for a 60-second socket token and connects directly. The two token types can't be used in place of each other.
 
 **Authorisation in one place.** `BoardAccessService.requireRole()` is called by every board read and write and by the socket `join`. Non-members get 404 rather than 403, so board ids can't be probed.
 
@@ -66,9 +66,9 @@ e2e            Playwright: two browsers collaborating on one board
 
 ### Known limits and what I'd do next
 
-- **One API instance.** Socket.IO rooms live in memory. To scale out, add the Redis adapter (`@socket.io/redis-adapter`) so a broadcast from one instance reaches sockets on another.
+- **Many API instances, one Postgres.** Socket.IO rooms live in each instance's memory, and serverless hosting runs several instances. The Postgres adapter (`@socket.io/postgres-adapter`) relays broadcasts between them over `LISTEN/NOTIFY`, so no Redis is needed. At high message rates a Redis adapter would be the next step.
 - **Events after commit, not in it.** If the process dies between the commit and the broadcast, viewers miss that event until their next reconnect, which triggers a full refetch. A transactional outbox would make delivery guaranteed.
-- **Free-tier hosting** sleeps after inactivity, so the first request can take ~30 seconds.
+- **Serverless WebSockets** close when the function reaches its time limit. The client reconnects and refetches the board, so a viewer may see a brief "reconnecting" gap.
 
 ## Testing
 
@@ -100,9 +100,13 @@ Open http://localhost:3000, click **Try the live demo**, then open the same boar
 
 ## Deploy
 
-1. **Database:** create a free Postgres on [Neon](https://neon.tech) and copy its connection string.
-2. **API on Render:** New → Blueprint → this repo (uses `render.yaml`). Set `DATABASE_URL` to the Neon URL and `WEB_ORIGIN` to the Vercel URL. Migrations run on every deploy.
-3. **Web on Vercel:** import the repo with root directory `apps/web`. Set `API_URL` and `NEXT_PUBLIC_SOCKET_URL` to the Render URL.
+Everything runs on free tiers: Postgres on [Neon](https://neon.tech), and both apps on Vercel.
+
+1. **Database:** a Neon Postgres. Use the direct (non-pooled) connection string: the Socket.IO adapter needs `LISTEN/NOTIFY`, which a transaction pooler doesn't support.
+2. **API on Vercel:** import the repo with root directory `apps/api` (`apps/api/vercel.json` builds and runs migrations). Set `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production` and `WEB_ORIGIN` (the web app's URL).
+3. **Web on Vercel:** import the repo again with root directory `apps/web`. Set `API_URL` and `NEXT_PUBLIC_SOCKET_URL` to the API's URL.
+
+`render.yaml` is kept for hosting the API as a long-running server instead.
 
 ---
 
