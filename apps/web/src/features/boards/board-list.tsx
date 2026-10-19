@@ -26,12 +26,12 @@ export function BoardList() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b border-carbon bg-paper">
+      <header className="border-b border-ink bg-paper">
         <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-5 py-3 lg:px-10">
           <Link href="/" aria-label="Realtime Board home"><Logo /></Link>
           <div className="ms-auto flex items-center gap-2 text-sm">
             {session.data && (
-              <span className="flex items-center gap-2 rounded-full border border-carbon py-1 pe-3 ps-1 font-bold">
+              <span className="flex items-center gap-2 rounded-full border border-ink py-1 pe-3 ps-1 font-bold">
                 <Avatar name={session.data.name} size="sm" /> {session.data.name}
               </span>
             )}
@@ -40,7 +40,7 @@ export function BoardList() {
         </div>
       </header>
 
-      <main className="flex-1 bg-sky-wash">
+      <main className="grid-paper flex-1">
         <div className="mx-auto w-full max-w-[1440px] px-5 py-14 lg:px-10">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -56,7 +56,7 @@ export function BoardList() {
           {boards.isPending && <p className="mt-12 text-sm">Loading boards…</p>}
           {boards.isError && <p className="mt-12 text-sm text-danger">{boards.error.message}</p>}
           {boards.data?.length === 0 && (
-            <div className="mt-12 rounded-[30px] border border-dashed border-carbon bg-paper p-12 text-center">
+            <div className="mt-12 rounded-[20px] border border-dashed border-ink bg-paper p-12 text-center">
               <p className="display text-4xl">No boards yet</p>
               <p className="mt-3">Create your first one above.</p>
             </div>
@@ -67,17 +67,17 @@ export function BoardList() {
               <li key={board.id}>
                 <Link
                   href={`/boards/${board.id}`}
-                  className="group block overflow-hidden rounded-[30px] border border-carbon bg-paper transition-transform hover:-rotate-1"
+                  className="pinned pinned-hover group block overflow-hidden rounded-[20px] border border-ink bg-paper"
                 >
-                  <div aria-hidden className={`flex h-28 items-end gap-2 border-b border-carbon p-4 ${noteColor(board.id)}`}>
-                    <span className="h-14 w-1/3 rounded-2xl border border-carbon bg-paper" />
-                    <span className="h-20 w-1/3 rounded-2xl border border-carbon bg-paper" />
-                    <span className="h-10 w-1/3 rounded-2xl border border-carbon bg-paper" />
+                  <div aria-hidden className={`flex h-28 items-end gap-2 border-b border-ink p-4 ${noteColor(board.id)}`}>
+                    <span className="h-14 w-1/3 rounded-2xl border border-ink bg-paper" />
+                    <span className="h-20 w-1/3 rounded-2xl border border-ink bg-paper" />
+                    <span className="h-10 w-1/3 rounded-2xl border border-ink bg-paper" />
                   </div>
                   <div className="p-5">
                     <span className="text-xl font-bold">{board.title}</span>
                     <span className="mt-2 flex items-center gap-2 text-xs">
-                      <span className="label rounded-full border border-carbon px-2.5 py-0.5 uppercase">{board.role.toLowerCase()}</span>
+                      <span className="tag rounded-full border border-ink px-2.5 py-0.5 uppercase">{board.role.toLowerCase()}</span>
                       updated {new Date(board.updatedAt).toLocaleDateString()}
                     </span>
                   </div>

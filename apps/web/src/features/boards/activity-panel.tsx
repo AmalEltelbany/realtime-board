@@ -7,7 +7,7 @@ import { boardKeys, boardsApi } from "./boards-api";
 export function ActivityPanel({ boardId }: { boardId: string }) {
   const activity = useQuery({ queryKey: boardKeys.activity(boardId), queryFn: () => boardsApi.activity(boardId) });
   return (
-    <aside className="w-72 shrink-0 overflow-y-auto border-s border-carbon bg-paper p-4" aria-label="Activity">
+    <aside className="w-72 shrink-0 overflow-y-auto border-s border-ink bg-paper p-4" aria-label="Activity">
       <h2 className="display mb-5 text-2xl">Activity</h2>
       {activity.isPending && <p className="text-xs text-muted">Loading…</p>}
       {activity.data?.length === 0 && <p className="text-xs text-muted">Changes to this board will show up here as they happen.</p>}

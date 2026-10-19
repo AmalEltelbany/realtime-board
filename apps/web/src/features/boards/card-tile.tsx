@@ -14,7 +14,7 @@ export function CardTile({ card, canEdit, color, onOpen }: { card: CardDto; canE
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
-      className={`cursor-pointer rounded-2xl border border-carbon bg-paper px-3.5 py-3 text-sm font-semibold transition-colors hover:bg-sky-wash focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-carbon ${isDragging ? "opacity-30" : ""}`}
+      className={`cursor-pointer rounded-xl border border-ink bg-paper px-3.5 py-3 text-sm font-semibold shadow-[2px_2px_0_var(--ink)] transition hover:-translate-y-px hover:shadow-[3px_3px_0_var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink ${isDragging ? "opacity-30" : ""}`}
       {...attributes}
       {...listeners}
       // dnd-kit makes the tile a keyboard-focusable button (space picks it up); Enter and click open it.
@@ -27,7 +27,7 @@ export function CardTile({ card, canEdit, color, onOpen }: { card: CardDto; canE
         else listeners?.onKeyDown?.(event);
       }}
     >
-      <span aria-hidden className={`mb-2 block h-2 w-10 rounded-full border border-carbon ${color}`} />
+      <span aria-hidden className={`mb-2 block h-2 w-10 rounded-full border border-ink ${color}`} />
       {card.title}
       {card.description && <span className="mt-1.5 block text-xs font-medium text-muted">≡ has notes</span>}
     </li>
@@ -36,6 +36,6 @@ export function CardTile({ card, canEdit, color, onOpen }: { card: CardDto; canE
 
 export function CardPreview({ card }: { card: CardDto }) {
   return (
-    <div className="rotate-3 rounded-2xl border border-carbon bg-sunburst px-3.5 py-3 text-sm font-bold">{card.title}</div>
+    <div className="pinned rotate-3 rounded-xl border border-ink bg-lime px-3.5 py-3 text-sm font-bold">{card.title}</div>
   );
 }

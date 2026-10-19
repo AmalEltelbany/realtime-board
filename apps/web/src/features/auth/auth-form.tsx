@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { loginSchema, registerSchema } from "@board/shared";
 import { Button, Field, Input, Logo } from "@/components/ui";
-import { Ribbon, Sticker } from "../landing/stickers";
+import { SyncWire } from "../landing/pinboard";
 import { ApiError } from "@/lib/api-client";
 import { authApi } from "./auth-api";
 import { DemoButton } from "./demo-button";
@@ -54,7 +54,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         <Link href="/" className="mb-10" aria-label="Realtime Board home">
           <Logo />
         </Link>
-        <h1 className="display text-5xl">{mode === "login" ? "Welcome back" : "Join the board"}</h1>
+        <h1 className="display text-6xl">{mode === "login" ? "Welcome back" : "Join the board"}</h1>
         <p className="mt-4 text-muted">
           {mode === "login" ? "Sign in to see your boards." : "Boards are free. Invite your team after."}
         </p>
@@ -82,8 +82,8 @@ export function AuthForm({ mode }: { mode: Mode }) {
           </Button>
         </form>
 
-        <div className="label my-6 flex items-center gap-3 text-xs uppercase">
-          <span className="h-px flex-1 bg-carbon" /> or <span className="h-px flex-1 bg-carbon" />
+        <div className="tag my-6 flex items-center gap-3 text-xs uppercase">
+          <span className="h-px flex-1 bg-ink" /> or <span className="h-px flex-1 bg-ink" />
         </div>
         <DemoButton variant="secondary" />
 
@@ -106,27 +106,13 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
 function AuthAside() {
   return (
-    <aside aria-hidden className="relative hidden overflow-hidden border-s border-carbon bg-sky-wash lg:flex lg:flex-col lg:justify-center lg:px-16">
-      <Ribbon className="inset-x-0 top-[45%] h-[40%] w-full" />
-      <p className="display relative z-10 text-[clamp(4rem,7vw,7.5rem)]">
-        Drag it.
+    <aside className="grid-paper hidden flex-col justify-center gap-10 border-s border-ink px-14 py-12 lg:flex">
+      <p className="display text-[clamp(3.5rem,5.5vw,6rem)]">
+        One board.
         <br />
-        Everyone
-        <br />
-        sees it.
+        <span className="marker">Every tab.</span>
       </p>
-      <Sticker className="end-12 top-16 rotate-6 bg-sunburst px-4 py-3">
-        <span className="block text-sm font-bold">Ship v1</span>
-        <span className="text-xs">moved to Doing</span>
-      </Sticker>
-      <Sticker className="bottom-16 start-16 -rotate-6 bg-ember px-4 py-2">
-        <span className="label flex items-center gap-2 text-sm uppercase">
-          <span className="size-2.5 rounded-full border border-carbon bg-paper" /> Live
-        </span>
-      </Sticker>
-      <Sticker className="bottom-28 end-20 rotate-[8deg] bg-lavender px-3 py-2">
-        <span className="text-sm font-bold">Omar is here</span>
-      </Sticker>
+      <SyncWire className="w-full max-w-xl" />
     </aside>
   );
 }

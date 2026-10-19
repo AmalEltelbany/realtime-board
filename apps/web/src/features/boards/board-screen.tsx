@@ -96,9 +96,9 @@ function Board({ board }: { board: BoardDto }) {
 
   return (
     <div className="flex h-dvh flex-col">
-      <header className="flex flex-wrap items-center gap-3 border-b border-carbon bg-paper px-4 py-2.5">
+      <header className="flex flex-wrap items-center gap-3 border-b border-ink bg-paper px-4 py-2.5">
         <Link href="/boards" aria-label="Boards"><LogoMark className="size-8" /></Link>
-        <Link href="/boards" className="label rounded-full border border-carbon px-3 py-1.5 text-xs hover:bg-sky-wash">← Boards</Link>
+        <Link href="/boards" className="tag rounded-full border border-ink px-3 py-1.5 text-xs hover:bg-canvas">← Boards</Link>
         <BoardTitle title={board.title} canEdit={canEdit} onRename={(title) => mutations.renameBoard.mutate(title)} />
         <ConnectionBadge state={connection} />
         <div className="ms-auto flex items-center gap-3">
@@ -111,16 +111,16 @@ function Board({ board }: { board: BoardDto }) {
       </header>
 
       {mutations.notice && (
-        <div role="status" className="flex items-center justify-between border-b border-carbon bg-sunburst px-4 py-2 text-sm font-bold">
+        <div role="status" className="flex items-center justify-between border-b border-ink bg-lime px-4 py-2 text-sm font-bold">
           {mutations.notice}
           <Button variant="ghost" onClick={mutations.dismissNotice}>Dismiss</Button>
         </div>
       )}
-      {!canEdit && <p className="border-b border-carbon bg-lavender px-4 py-2 text-sm font-bold">You can view this board but not change it.</p>}
+      {!canEdit && <p className="border-b border-ink bg-bubblegum px-4 py-2 text-sm font-bold">You can view this board but not change it.</p>}
 
       <div className="flex min-h-0 flex-1">
         <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDraggingId(null)}>
-          <div className="flex flex-1 items-start gap-4 overflow-x-auto bg-sky-wash p-5">
+          <div className="grid-paper flex flex-1 items-start gap-5 overflow-x-auto p-6">
             {lists.map((list, i) => (
               <ListColumn
                 key={list.id}
@@ -171,7 +171,7 @@ function BoardTitle({ title, canEdit, onRename }: { title: string; canEdit: bool
   if (!editing) {
     return (
       <h1 className="text-xl font-bold tracking-tight">
-        <button type="button" disabled={!canEdit} onClick={() => setEditing(true)} className="rounded-full px-2 enabled:hover:bg-sky-wash">{title}</button>
+        <button type="button" disabled={!canEdit} onClick={() => setEditing(true)} className="rounded-full px-2 enabled:hover:bg-canvas">{title}</button>
       </h1>
     );
   }
@@ -191,18 +191,18 @@ function BoardTitle({ title, canEdit, onRename }: { title: string; canEdit: bool
 
 function ConnectionBadge({ state }: { state: ConnectionState }) {
   const fills: Record<ConnectionState, string> = {
-    live: "bg-paper",
-    connecting: "bg-sunburst",
-    offline: "bg-ember",
+    live: "bg-lime",
+    connecting: "bg-sand",
+    offline: "bg-tangerine",
   };
   const labels: Record<ConnectionState, string> = { live: "Live", connecting: "Connecting…", offline: "Offline, retrying" };
   return (
     <span
       role="status"
       aria-label={`Connection: ${labels[state]}`}
-      className={`label flex items-center gap-1.5 rounded-full border border-carbon px-2.5 py-1 text-[11px] uppercase ${fills[state]}`}
+      className={`tag flex items-center gap-1.5 rounded-full border border-ink px-2.5 py-1 text-[11px] uppercase ${fills[state]}`}
     >
-      <span className={`size-2 rounded-full bg-carbon ${state === "live" ? "" : "opacity-40"}`} /> {labels[state]}
+      <span className={`size-2 rounded-full ${state === "live" ? "animate-blink bg-wire" : "bg-ink opacity-40"}`} /> {labels[state]}
     </span>
   );
 }

@@ -43,7 +43,7 @@ export function ListColumn({ list, color, cards, canEdit, onAddCard, onRename, o
   return (
     <section
       aria-label={list.title}
-      className={`flex w-72 shrink-0 flex-col rounded-[20px] border border-carbon p-3 ${isOver ? "bg-sunburst" : "bg-paper"}`}
+      className={`flex w-72 shrink-0 flex-col pinned rounded-[20px] border border-ink p-3 ${isOver ? "bg-lime" : "bg-paper"}`}
     >
       <header className="mb-3 flex items-center justify-between gap-2">
         {editingTitle ? (
@@ -52,9 +52,9 @@ export function ListColumn({ list, color, cards, canEdit, onAddCard, onRename, o
           </form>
         ) : (
           <h2 className="flex items-center gap-2 px-1 text-sm font-bold">
-            <span aria-hidden className={`size-3 rounded-full border border-carbon ${color}`} />
+            <span aria-hidden className={`size-3 rounded-full border border-ink ${color}`} />
             <button type="button" disabled={!canEdit} onClick={() => setEditingTitle(true)}>{list.title}</button>
-            <span className="rounded-full border border-carbon px-2 py-0.5 text-[11px] font-bold">{cards.length}</span>
+            <span className="rounded-full border border-ink px-2 py-0.5 text-[11px] font-bold">{cards.length}</span>
           </h2>
         )}
         {canEdit && (

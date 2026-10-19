@@ -1,94 +1,126 @@
 @import "tailwindcss";
 
 /*
- * Realtime Board design system, after Refero's "Slush" style: a sticker book on pastel paper.
- * Black 1px outlines on everything interactive, pill controls, a shared six-colour sticker palette,
- * enormous display type with crushed leading. No gradients, no shadows: depth comes from colour bands and outlines.
+ * Realtime Board: "the live pinboard".
+ * Warm grid paper, cards pinned with hard-edged shadows, a sticker palette of lime, sky, bubblegum,
+ * tangerine and sand, and a red wire that carries changes between tabs. Inspired by sticker-book sites,
+ * but built around the product's own idea: one board, connected everywhere.
  */
 :root {
   color-scheme: light;
 
-  /* Neutrals */
-  --carbon: #000000;
-  --paper: #ffffff;
-  --sky-wash: #dceeff;
-  --concrete: #cccccc;
-  --mist: #e9e9e9;
-  --ink-soft: #3d3d3d;
+  --ink: #141210;
+  --ink-soft: #57524a;
+  --canvas: #f4efe4;
+  --paper: #fffdf7;
+  --grid: #e4ddcd;
 
-  /* Sticker palette: used together, never one as "the" accent. Blue is decorative only, never an action colour. */
-  --electric-blue: #4da2ff;
-  --mint-pop: #55db9c;
-  --lavender: #e9ccff;
-  --ember: #fb4903;
-  --sunburst: #ffd731;
-  --voltage-violet: #5c4ade;
+  --lime: #c9f23e;
+  --sky: #a8d4ff;
+  --bubblegum: #ffa6d6;
+  --tangerine: #ff9142;
+  --sand: #f1d9a7;
+  --cobalt: #2b4dff;
+  --wire: #ff3d2e;
 
-  --danger: #c4320a;
+  --danger: #c4250f;
 }
 
 @theme inline {
-  /* Semantic roles used across the app */
-  --color-background: var(--paper);
+  --color-background: var(--canvas);
   --color-surface: var(--paper);
-  --color-surface-muted: var(--mist);
-  --color-foreground: var(--carbon);
+  --color-surface-muted: var(--canvas);
+  --color-foreground: var(--ink);
   --color-muted: var(--ink-soft);
-  --color-border: var(--carbon);
-  --color-accent: var(--carbon);
+  --color-border: var(--ink);
+  --color-accent: var(--ink);
   --color-accent-foreground: var(--paper);
   --color-danger: var(--danger);
 
-  /* Raw palette */
-  --color-carbon: var(--carbon);
+  --color-ink: var(--ink);
+  --color-canvas: var(--canvas);
   --color-paper: var(--paper);
-  --color-sky-wash: var(--sky-wash);
-  --color-concrete: var(--concrete);
-  --color-mist: var(--mist);
-  --color-electric-blue: var(--electric-blue);
-  --color-mint-pop: var(--mint-pop);
-  --color-lavender: var(--lavender);
-  --color-ember: var(--ember);
-  --color-sunburst: var(--sunburst);
-  --color-voltage-violet: var(--voltage-violet);
+  --color-grid: var(--grid);
+  --color-lime: var(--lime);
+  --color-sky: var(--sky);
+  --color-bubblegum: var(--bubblegum);
+  --color-tangerine: var(--tangerine);
+  --color-sand: var(--sand);
+  --color-cobalt: var(--cobalt);
+  --color-wire: var(--wire);
 
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-bowlby);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-instrument);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains);
 }
 
 body {
-  background: var(--paper);
-  color: var(--carbon);
+  background: var(--canvas);
+  color: var(--ink);
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  font-feature-settings: "ss01" on, "tnum" on;
 }
 
-/* Display type is sculptural: heavy, uppercase, crushed line-height. */
+/* Condensed, extra-heavy display type with tight leading. */
 .display {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-weight: 400;
+  font-weight: 800;
+  font-variation-settings: "wdth" 75, "opsz" 96;
   text-transform: uppercase;
-  line-height: 0.8;
-  letter-spacing: 0;
+  line-height: 0.86;
+  letter-spacing: -0.01em;
 }
 
-/* Nav, button and label text gets a little air. */
-.label {
-  font-weight: 700;
-  letter-spacing: 0.032em;
+/* Small technical labels: event names, states, counts. */
+.tag {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* The only animation in the system: a continuous marquee strip. */
-@keyframes marquee {
+/* Graph paper the board sits on. */
+.grid-paper {
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Pinned things cast a hard, ink-coloured shadow and lift a little on hover. */
+.pinned {
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.pinned-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+/* Highlighter swipe behind a word. */
+.marker {
+  background: linear-gradient(transparent 12%, var(--lime) 12%, var(--lime) 88%, transparent 88%);
+  padding: 0 0.08em;
+}
+
+@keyframes ticker {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+@keyframes blink {
+  50% { opacity: 0.25; }
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-26px, 18px); }
+}
 
-.animate-marquee { animation: marquee 30s linear infinite; }
+.animate-ticker { animation: ticker 40s linear infinite; }
+.animate-blink { animation: blink 1.4s steps(1) infinite; }
+.animate-drift { animation: drift 6s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee { animation: none; }
+  .animate-ticker, .animate-blink, .animate-drift { animation: none; }
+  .wire-pulse { display: none; }
 }
